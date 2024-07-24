@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "163685666920",
+    "project_id": "plastic-eliminator-d8c32",
+    "storage_bucket": "plastic-eliminator-d8c32.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:163685666920:android:2206f841dca2681137ebdd",
+        "android_client_info": {
+          "package_name": "com.NIC.plastic_eliminator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfvRldOXxMaSBKSJNtaH-ZOxMXsQGvGWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
