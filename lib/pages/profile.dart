@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:plastic_eliminator/pages/signup.dart';
-import 'package:plastic_eliminator/services/shared_pref.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -11,162 +14,145 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  // Function to delete the user
-  Future<void> deleteUser() async {
-    try {
-      // Get the current user
-      User? user = FirebaseAuth.instance.currentUser;
+  User? currentUser;
+  String userName = 'User';
+  String email = 'Email not available';
+  String phoneNumber = 'Phone number not provided';
+  String photoURL = 'https://via.placeholder.com/150';
 
-      if (user != null) {
-        // Delete the user
-        await user.delete();
-        print('User deleted successfully.');
-
-        // Navigate to the sign-up screen
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => Signup(),
-          ),
-        );
-      } else {
-        print('No user is currently signed in.');
-      }
-    } catch (e) {
-      print('Error deleting user: $e');
-    }
-  }
-
-  // Function to log out the user
-  Future<void> logoutUser() async {
-    try {
-      // Sign out the user
-      await FirebaseAuth.instance.signOut();
-      print('User signed out successfully.');
-
-      // Navigate to the sign-up screen
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Signup(),
-        ),
-      );
-    } catch (e) {
-      print('Error signing out user: $e');
-    }
-  }
-
-  String? name, image, email;
-
-  Future<void> getthedatafromsharedpref() async {
-    name = await SharedPreferanceHelper().getUserName();
-    image = await SharedPreferanceHelper().getUserImage();
-    email = await SharedPreferanceHelper().getUserEmail();
-    setState(() {});
-  }
+  final ImagePicker _picker = ImagePicker();
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    getthedatafromsharedpref();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      final userDoc =
+          await _firestore.collection('users').doc(currentUser!.uid).get();
+      setState(() {
+        userName = userDoc.data()?['name'] ?? 'User';
+        email = currentUser!.email ?? 'Email not available';
+        phoneNumber =
+            userDoc.data()?['phoneNumber'] ?? 'Phone number not provided';
+        photoURL = userDoc.data()?['profileImageUrl'] ??
+            currentUser!.photoURL ??
+            'https://via.placeholder.com/150';
+      });
+    }
+  }
+
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => Signup()),
+    );
+  }
+
+  Future<void> selectProfileImage(BuildContext context) async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+
+      // Upload image to Firebase Storage
+      try {
+        final storageRef =
+            _storage.ref().child('profile_images/${currentUser!.uid}');
+        final uploadTask = storageRef.putFile(imageFile);
+        final snapshot = await uploadTask.whenComplete(() {});
+        final downloadUrl = await snapshot.ref.getDownloadURL();
+
+        // Update user profile and Firestore document
+        await currentUser!.updatePhotoURL(downloadUrl);
+        await _firestore.collection('users').doc(currentUser!.uid).update({
+          'profileImageUrl': downloadUrl,
+        });
+
+        setState(() {
+          photoURL = downloadUrl;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Profile image updated successfully.')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error uploading image: $e')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: const Text('Profile'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Hello,',
-                      style: TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w500,
-                        color: Color.fromARGB(188, 0, 0, 0),
-                      ),
-                    ),
-                    Text(
-                      name ?? 'Loading...',
-                      style: const TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Text(
-                      email ?? 'Loading...',
-                      style: const TextStyle(
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: image != null
-                      ? Image.network(
-                          'https://user-images.githubusercontent.com/55682574/146731502-9f57b365-6375-4d16-9344-2bc471386c7d.png',
-                          height: 60,
-                          width: 60,
-                          fit: BoxFit.cover,
-                        )
-                      : Image.asset(
-                          'Assets/images/girl_profile.png',
-                          height: 60,
-                          width: 60,
-                          fit: BoxFit.cover,
-                        ),
-                ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                // Confirm user deletion with a dialog
-                bool? confirmDeletion = await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text('Delete Account'),
-                    content:
-                        Text('Are you sure you want to delete your account?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
-                        child: Text('Delete'),
-                      ),
-                    ],
-                  ),
-                );
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Profile image
+              CircleAvatar(
+                radius: 60,
+                backgroundImage: NetworkImage(photoURL),
+                backgroundColor: Colors.transparent,
+              ),
+              const SizedBox(height: 16),
 
-                if (confirmDeletion == true) {
-                  // Call the deleteUser function
-                  await deleteUser();
-                }
-              },
-              child: Text('Delete Account'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                // Call the logoutUser function
-                await logoutUser();
-              },
-              child: Text('Logout'),
-            ),
-          ],
+              // Upload profile image button
+              ElevatedButton(
+                onPressed: () => selectProfileImage(context),
+                child: const Text('Upload Profile Image'),
+              ),
+              const SizedBox(height: 16),
+
+              // Username
+              Text(
+                'Hello, $userName!',
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Email
+              Text(
+                'Email: $email',
+                style: const TextStyle(fontSize: 18, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+
+              // Phone number
+              Text(
+                'Phone: $phoneNumber',
+                style: const TextStyle(fontSize: 18, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // Logout button
+              ElevatedButton(
+                onPressed: _logout,
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                child: const Text('Logout'),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,23 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferanceHelper {
+  static const String _isLoggedInKey = 'isLoggedIn';
+
+  Future<void> saveLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isLoggedInKey, true);
+  }
+
+  Future<void> removeLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_isLoggedInKey);
+  }
+
+  Future<bool> getLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_isLoggedInKey) ?? false;
+  }
+
   Future<void> saveUserName(String userName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userName', userName);

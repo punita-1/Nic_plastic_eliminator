@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:plastic_eliminator/pages/bottomnav.dart';
-import 'package:plastic_eliminator/pages/home.dart';
 import 'package:plastic_eliminator/pages/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:plastic_eliminator/services/auth_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -20,33 +21,121 @@ class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
 
-  userLogin() async {
+  // userLogin() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() {
+  //       email = gmailController.text;
+  //       password = passwordController.text;
+  //     });
+  //     try {
+  //       await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //         email: email!,
+  //         password: password!,
+  //       );
+  //       Navigator.pushReplacement(
+  //           context, MaterialPageRoute(builder: (context) => Bottomnav()));
+  //     } on FirebaseAuthException catch (e) {
+  //       String errorMessage;
+  //       if (e.code == 'user-not-found') {
+  //         errorMessage = 'No user found for this email';
+  //       } else if (e.code == 'wrong-password') {
+  //         errorMessage = 'Incorrect password';
+  //       } else {
+  //         errorMessage = 'An error occurred: ${e.message}';
+  //       }
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //           content: Text(
+  //         errorMessage,
+  //         style: TextStyle(fontSize: 20.0),
+  //       )));
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //           content: Text(
+  //         'An error occurred: ${e.toString()}',
+  //         style: TextStyle(fontSize: 20.0),
+  //       )));
+  //     }
+  //   }
+  // }
+  // Future<void> userLogin() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() {
+  //       email = gmailController.text;
+  //       password = passwordController.text;
+  //     });
+  //     try {
+  //       await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //         email: email!,
+  //         password: password!,
+  //       );
+
+  //       // Save login state
+  //       SharedPreferences prefs = await SharedPreferences.getInstance();
+  //       await prefs.setBool('isLoggedIn', true);
+
+  //       Navigator.pushReplacement(
+  //           context, MaterialPageRoute(builder: (context) => Bottomnav()));
+  //     } on FirebaseAuthException catch (e) {
+  //       String errorMessage;
+  //       if (e.code == 'user-not-found') {
+  //         errorMessage = 'No user found for this email';
+  //       } else if (e.code == 'wrong-password') {
+  //         errorMessage = 'Incorrect password';
+  //       } else {
+  //         errorMessage = 'An error occurred: ${e.message}';
+  //       }
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //           content: Text(
+  //         errorMessage,
+  //         style: TextStyle(fontSize: 20.0),
+  //       )));
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //           content: Text(
+  //         'An error occurred: ${e.toString()}',
+  //         style: TextStyle(fontSize: 20.0),
+  //       )));
+  //     }
+  //   }
+  // }
+// class _LoginPageState extends State<LoginPage> {
+  // final _formKey = GlobalKey<FormState>();
+  // final TextEditingController gmailController = TextEditingController();
+  // final TextEditingController passwordController = TextEditingController();
+  // String? email, password;
+
+  // Future<void> userLogin() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     setState(() {
+  //       email = gmailController.text;
+  //       password = passwordController.text;
+  //     });
+
+  //     try {
+  //       await AuthService().signInWithEmailAndPassword(email!, password!);
+  //       Navigator.pushReplacement(
+  //           context, MaterialPageRoute(builder: (context) => Bottomnav()));
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+  //           content: Text(
+  //         'An error occurred: ${e.toString()}',
+  //         style: TextStyle(fontSize: 20.0),
+  //       )));
+  //     }
+  //   }
+  // }
+
+  Future<void> userLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         email = gmailController.text;
         password = passwordController.text;
       });
+
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: email!,
-          password: password!,
-        );
+        await AuthService().signInWithEmailAndPassword(email!, password!);
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => Bottomnav()));
-      } on FirebaseAuthException catch (e) {
-        String errorMessage;
-        if (e.code == 'user-not-found') {
-          errorMessage = 'No user found for this email';
-        } else if (e.code == 'wrong-password') {
-          errorMessage = 'Incorrect password';
-        } else {
-          errorMessage = 'An error occurred: ${e.message}';
-        }
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-          errorMessage,
-          style: TextStyle(fontSize: 20.0),
-        )));
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(

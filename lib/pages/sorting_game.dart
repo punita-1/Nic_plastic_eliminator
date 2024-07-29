@@ -1,110 +1,137 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-class SortingGame extends StatefulWidget {
-  @override
-  _SortingGameState createState() => _SortingGameState();
+void main() {
+  runApp(PlasticSortingGame());
 }
 
-class _SortingGameState extends State<SortingGame> {
-  final List<String> items = ['Plastic Bottle', 'Paper', 'Glass', 'Metal Can'];
-  final List<String> recyclable = ['Plastic Bottle', 'Paper', 'Glass', 'Metal Can'];
-  List<String> currentList = [];
-  int score = 0;
-  Timer? _timer;
-  int _start = 120; // 2 minutes
-
+class PlasticSortingGame extends StatelessWidget {
   @override
-  void initState() {
-    super.initState();
-    currentList = List.from(items)..shuffle();
-    startTimer();
-  }
-
-  void startTimer() {
-    const oneSec = const Duration(seconds: 1);
-    _timer = Timer.periodic(
-      oneSec,
-      (Timer timer) => setState(
-        () {
-          if (_start < 1) {
-            timer.cancel();
-            showFinalScore();
-          } else {
-            _start = _start - 1;
-          }
-        },
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Plastic Sorting Game',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
       ),
+      home: SortingGameScreen(),
     );
   }
+}
 
-  void checkItem(String item) {
-    if (recyclable.contains(item)) {
-      setState(() {
-        score++;
-        currentList.remove(item);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Correct!')));
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Wrong!')));
-    }
-
-    if (currentList.isEmpty) {
-      _timer?.cancel();
-      showFinalScore();
-    }
-  }
-
-  void showFinalScore() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Time's Up!"),
-          content: Text('Your final score is $score'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
+class SortingGameScreen extends StatefulWidget {
   @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+  _SortingGameScreenState createState() => _SortingGameScreenState();
+}
+
+class _SortingGameScreenState extends State<SortingGameScreen> {
+  final List<WasteItem> wasteItems = [
+    WasteItem('Plastic Bottle', 'Assets/images/water-bottle.png', true),
+    WasteItem('Plastic Bag', 'Assets/images/plastic-bag.png', false),
+    // Add more waste items
+  ];
+
+  int score = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sorting Game'),
+        title: Text('Plastic Sorting Game'),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text('Score: $score', style: TextStyle(fontSize: 24)),
-          Text('Time Left: $_start seconds', style: TextStyle(fontSize: 24)),
-          Expanded(
-            child: ListView.builder(
-              itemCount: currentList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(currentList[index]),
-                  onTap: () => checkItem(currentList[index]),
-                );
-              },
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: wasteItems
+                .map((item) => Draggable<WasteItem>(
+                      data: item,
+                      child: WasteItemWidget(item: item),
+                      feedback: WasteItemWidget(item: item),
+                      childWhenDragging: Opacity(
+                        opacity: 0.5,
+                        child: WasteItemWidget(item: item),
+                      ),
+                    ))
+                .toList(),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              DragTarget<WasteItem>(
+                builder: (context, candidateData, rejectedData) => BinWidget(
+                  label: 'Recyclable',
+                  imagePath: 'Assets/images/recycle-bin.png',
+                ),
+                onAccept: (item) {
+                  if (item.isRecyclable) {
+                    setState(() {
+                      score++;
+                    });
+                  }
+                },
+              ),
+              DragTarget<WasteItem>(
+                builder: (context, candidateData, rejectedData) => BinWidget(
+                  label: 'Non-Recyclable',
+                  imagePath: 'Assets/images/non-biodegradable.png',
+                ),
+                onAccept: (item) {
+                  if (!item.isRecyclable) {
+                    setState(() {
+                      score++;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          Text(
+            'Score: $score',
+            style: TextStyle(fontSize: 24),
           ),
         ],
       ),
+    );
+  }
+}
+
+class WasteItem {
+  final String name;
+  final String imagePath;
+  final bool isRecyclable;
+
+  WasteItem(this.name, this.imagePath, this.isRecyclable);
+}
+
+class WasteItemWidget extends StatelessWidget {
+  final WasteItem item;
+
+  WasteItemWidget({required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Image.asset(item.imagePath, width: 80, height: 80),
+        Text(item.name),
+      ],
+    );
+  }
+}
+
+class BinWidget extends StatelessWidget {
+  final String label;
+  final String imagePath;
+
+  BinWidget({required this.label, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Image.asset(imagePath, width: 100, height: 100),
+        Text(label),
+      ],
     );
   }
 }

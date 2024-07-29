@@ -19,7 +19,7 @@ class _BottomnavState extends State<Bottomnav> {
   late Home Homepage;
   late Profile profile;
   late Community community;
-  late Nearby nearby;
+  late Maps nearby;
   late Scanner scanner;
   int currentTabIndex = 0;
 
@@ -28,7 +28,7 @@ class _BottomnavState extends State<Bottomnav> {
     Homepage = Home();
     profile = Profile();
     community = Community();
-    nearby = Nearby();
+    nearby = Maps();
     scanner = Scanner();
     pages = [Homepage, community, scanner, nearby, profile];
 
