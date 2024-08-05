@@ -1,0 +1,12 @@
+{
+  "helloWorld": "Hello World!",
+   "plasticEliminator": "PlasticEliminator",
+  "plasticFreePlanet": "Plastic-free planet",
+  "startsWithYou": "Starts with you",
+  "@helloWorld": {
+    "description": "The conventional newborn programmer greeting"
+  },
+  "@plasticFreePlanet": {
+    "description": "A phrase promoting a world without plastic"
+  }
+}

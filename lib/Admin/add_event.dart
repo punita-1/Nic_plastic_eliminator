@@ -25,6 +25,7 @@ class _AddEventState extends State<AddEvent> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController rewardController = TextEditingController();
   TextEditingController rulesController = TextEditingController();
+  bool _isLoading = false;
 
   Future getImage() async {
     var image = await _picker.pickImage(source: ImageSource.gallery);
@@ -34,39 +35,57 @@ class _AddEventState extends State<AddEvent> {
 
   uploadItem() async {
     if (selectedImage != null && nameController.text.isNotEmpty) {
-      String addId = randomAlphaNumeric(10);
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child("eventImages").child(addId);
+      setState(() {
+        _isLoading = true;
+      });
 
-      final UploadTask task = firebaseStorageRef.putFile(selectedImage!);
-      var downloadUrl = await (await task).ref.getDownloadURL();
+      try {
+        String addId = randomAlphaNumeric(10);
+        Reference firebaseStorageRef =
+            FirebaseStorage.instance.ref().child("eventImages").child(addId);
 
-      Map<String, dynamic> event = {
-        "Name": nameController.text,
-        "Date": dateController.text,
-        "Time": timeController.text,
-        "Location": locationController.text,
-        "Description": descriptionController.text,
-        "Reward": rewardController.text,
-        "Rules": rulesController.text,
-        "Image": downloadUrl,
-      };
+        final UploadTask task = firebaseStorageRef.putFile(selectedImage!);
+        var downloadUrl = await (await task).ref.getDownloadURL();
 
-      await DatabaseMethods().addevents(event, value!).then((value) {
-        selectedImage = null;
-        nameController.clear();
-        dateController.clear();
-        timeController.clear();
-        locationController.clear();
-        descriptionController.clear();
-        rewardController.clear();
-        rulesController.clear();
+        Map<String, dynamic> event = {
+          "Name": nameController.text,
+          "Date": dateController.text,
+          "Time": timeController.text,
+          "Location": locationController.text,
+          "Description": descriptionController.text,
+          "Reward": rewardController.text,
+          "Rules": rulesController.text,
+          "Image": downloadUrl,
+        };
+
+        await DatabaseMethods().addevents(event, value!).then((value) {
+          setState(() {
+            _isLoading = false;
+            selectedImage = null;
+            nameController.clear();
+            dateController.clear();
+            timeController.clear();
+            locationController.clear();
+            descriptionController.clear();
+            rewardController.clear();
+            rulesController.clear();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+            'Event added successfully!',
+            style: TextStyle(fontSize: 20.0),
+          )));
+        });
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-          'Event added successfully!',
+          'Failed to add event: $e',
           style: TextStyle(fontSize: 20.0),
         )));
-      });
+      }
     }
   }
 
@@ -195,7 +214,23 @@ class _AddEventState extends State<AddEvent> {
               SizedBox(height: 15),
               ElevatedButton(
                 onPressed: uploadItem,
-                child: Text('Add Event'),
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        8), // Adjust this value for less curvature
+                  ),
+                  backgroundColor: Colors.white, // Background color
+                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.grey,
+                        ),
+                      )
+                    : Text(
+                        'Add Event',
+                        style: TextStyle(color: Colors.grey),
+                      ),
               ),
             ],
           ),
