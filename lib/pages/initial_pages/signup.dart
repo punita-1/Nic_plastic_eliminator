@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:plastic_eliminator/pages/initial_pages/login.dart';
 import 'package:random_string/random_string.dart';
-import 'bottomnav.dart'; // Your Bottomnav widget
+import 'bottomnav.dart'; 
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Signup extends StatefulWidget {
@@ -150,257 +150,259 @@ class _SignupState extends State<Signup> {
               ),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                        child: Icon(
-                      Icons.arrow_upward,
-                      // color: Colors.grey,
-                    )),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Center(
-                      child: GestureDetector(
-                        onTap: _pickImage,
-                        child: CircleAvatar(
-                          radius: 40,
-                          backgroundImage: _profileImage != null
-                              ? FileImage(_profileImage!)
-                              : AssetImage('Assets/logo_image/signup_man.png')
-                                  as ImageProvider,
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Icon(
-                              Icons.camera_alt,
-                              // color: Colors.grey
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                          child: Icon(
+                        Icons.arrow_upward,
+                        // color: Colors.grey,
+                      )),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Center(
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: CircleAvatar(
+                            radius: 40,
+                            backgroundImage: _profileImage != null
+                                ? FileImage(_profileImage!)
+                                : AssetImage('Assets/logo_image/signup_man.png')
+                                    as ImageProvider,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Icon(
+                                Icons.camera_alt,
+                                // color: Colors.grey
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      'Name',
-                      style: TextStyle(
-                        fontSize: 21,
-                        // color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _nameController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your name';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Name',
-                        prefixIcon: Icon(
-                          Icons.person,
+                      SizedBox(height: 20),
+                      Text(
+                        'Name',
+                        style: TextStyle(
+                          fontSize: 21,
                           // color: Colors.grey,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 15),
-                    Text(
-                      'Email',
-                      style: TextStyle(
-                        fontSize: 21,
-                        // color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _emailController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Email',
-                        prefixIcon: Icon(
-                          Icons.mail_outline,
-                          // color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    Text(
-                      'Password',
-                      style: TextStyle(
-                        fontSize: 21,
-                        // color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscureText,
-                      validator: (value) {
-                        if (value == null || value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Password',
-                        prefixIcon: Icon(
-                          Icons.password_outlined,
-                          // color: Colors.grey,
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
+                      TextFormField(
+                        controller: _nameController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Name',
+                          prefixIcon: Icon(
+                            Icons.person,
                             // color: Colors.grey,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
                         ),
                       ),
-                    ),
-                    SizedBox(height: 15),
-                    Text(
-                      'Phone Number',
-                      style: TextStyle(
-                        fontSize: 21,
-                        // color: Colors.grey,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _phoneController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your phone number';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Phone Number',
-                        prefixIcon: Icon(
-                          Icons.phone,
+                      SizedBox(height: 15),
+                      Text(
+                        'Email',
+                        style: TextStyle(
+                          fontSize: 21,
                           // color: Colors.grey,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 50),
-                    GestureDetector(
-                      onTap: _isLoading
-                          ? null
-                          : _signUp, // Disable button when loading
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.teal,
-                              Color(0xFFB2EBF2),
-                              // Colors.white,
+                      TextFormField(
+                        controller: _emailController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Email',
+                          prefixIcon: Icon(
+                            Icons.mail_outline,
+                            // color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      Text(
+                        'Password',
+                        style: TextStyle(
+                          fontSize: 21,
+                          // color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscureText,
+                        validator: (value) {
+                          if (value == null || value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Password',
+                          prefixIcon: Icon(
+                            Icons.password_outlined,
+                            // color: Colors.grey,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              // color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 15),
+                      Text(
+                        'Phone Number',
+                        style: TextStyle(
+                          fontSize: 21,
+                          // color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      TextFormField(
+                        controller: _phoneController,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your phone number';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Phone Number',
+                          prefixIcon: Icon(
+                            Icons.phone,
+                            // color: Colors.grey,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 50),
+                      GestureDetector(
+                        onTap: _isLoading
+                            ? null
+                            : _signUp, // Disable button when loading
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.teal,
+                                Color(0xFFB2EBF2),
+                                // Colors.white,
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Center(
+                            child: _isLoading
+                                ? CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  )
+                                : Text(
+                                    'SIGN UP',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 25.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Center(
+                          child: Text(
+                        'OR',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                      SizedBox(height: 20),
+                      Container(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                              EdgeInsets.symmetric(vertical: 16.0),
+                            ),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.g_mobiledata,
+                                color: Colors.teal,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Login With Google',
+                                style:
+                                    TextStyle(fontSize: 18, color: Colors.teal),
+                              ),
                             ],
                           ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: _isLoading
-                              ? CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
-                                )
-                              : Text(
-                                  'SIGN UP',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 25.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: 20),
-                    Center(
-                        child: Text(
-                      'OR',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )),
-                    SizedBox(height: 20),
-                    Container(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all<EdgeInsets>(
-                            EdgeInsets.symmetric(vertical: 16.0),
-                          ),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.g_mobiledata,
-                              color: Colors.teal,
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              'Login With Google',
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.teal),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Already have an account?",
-                          style: TextStyle(
-                            // color: Colors.black,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Login(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            " Sign in",
+                      SizedBox(height: 5),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Already have an account?",
                             style: TextStyle(
-                              // color: Colors.grey,
+                              // color: Colors.black,
                               fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Login(),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              " Sign in",
+                              style: TextStyle(
+                                // color: Colors.grey,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

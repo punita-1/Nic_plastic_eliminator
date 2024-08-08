@@ -22,7 +22,7 @@ import 'package:plastic_eliminator/pages/Home_page/Activities_pages/games/games_
 import 'package:plastic_eliminator/pages/map_page/mapnerby.dart';
 import 'package:plastic_eliminator/pages/tutorial_page/scanner.dart';
 import 'package:plastic_eliminator/pages/Home_page/New_in_eliminator/swiper_pages.dart';
-import 'package:plastic_eliminator/pages/tutorial_page/tutorial.dart';
+// import 'package:plastic_eliminator/pages/tutorial_page/tutorial.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:plastic_eliminator/pages/Home_page/shops_page/allshops.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/news.dart';
