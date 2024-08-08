@@ -68,10 +68,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
       appBar: AppBar(
         title: const Text('Video Player'),
       ),
-      body: Center(
-        child: YoutubePlayer(
-          controller: _controller,
-        ),
+      body: Column(
+        children: [
+          YoutubePlayer(
+            controller: _controller,
+          ),
+          Center(child: Text('some text'))
+        ],
       ),
     );
   }

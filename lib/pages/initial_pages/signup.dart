@@ -118,9 +118,9 @@ class _SignupState extends State<Signup> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.black,
-                  Colors.grey,
-                  Colors.grey[300]!,
+                  Colors.teal,
+                  Color(0xFFB2EBF2),
+                  // Colors.white,
                 ],
               ),
             ),
@@ -156,7 +156,7 @@ class _SignupState extends State<Signup> {
                     Center(
                         child: Icon(
                       Icons.arrow_upward,
-                      color: Colors.grey,
+                      // color: Colors.grey,
                     )),
                     SizedBox(
                       height: 10,
@@ -165,14 +165,17 @@ class _SignupState extends State<Signup> {
                       child: GestureDetector(
                         onTap: _pickImage,
                         child: CircleAvatar(
-                          radius: 50,
+                          radius: 40,
                           backgroundImage: _profileImage != null
                               ? FileImage(_profileImage!)
-                              : AssetImage('Assets/logo_image/neutral.png')
+                              : AssetImage('Assets/logo_image/signup_man.png')
                                   as ImageProvider,
                           child: Align(
-                            alignment: Alignment.center,
-                            child: Icon(Icons.camera_alt, color: Colors.grey),
+                            alignment: Alignment.bottomCenter,
+                            child: Icon(
+                              Icons.camera_alt,
+                              // color: Colors.grey
+                            ),
                           ),
                         ),
                       ),
@@ -182,7 +185,7 @@ class _SignupState extends State<Signup> {
                       'Name',
                       style: TextStyle(
                         fontSize: 21,
-                        color: Colors.grey,
+                        // color: Colors.grey,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -198,7 +201,7 @@ class _SignupState extends State<Signup> {
                         hintText: 'Name',
                         prefixIcon: Icon(
                           Icons.person,
-                          color: Colors.grey,
+                          // color: Colors.grey,
                         ),
                       ),
                     ),
@@ -207,7 +210,7 @@ class _SignupState extends State<Signup> {
                       'Email',
                       style: TextStyle(
                         fontSize: 21,
-                        color: Colors.grey,
+                        // color: Colors.grey,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -223,7 +226,7 @@ class _SignupState extends State<Signup> {
                         hintText: 'Email',
                         prefixIcon: Icon(
                           Icons.mail_outline,
-                          color: Colors.grey,
+                          // color: Colors.grey,
                         ),
                       ),
                     ),
@@ -232,7 +235,7 @@ class _SignupState extends State<Signup> {
                       'Password',
                       style: TextStyle(
                         fontSize: 21,
-                        color: Colors.grey,
+                        // color: Colors.grey,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -249,14 +252,14 @@ class _SignupState extends State<Signup> {
                         hintText: 'Password',
                         prefixIcon: Icon(
                           Icons.password_outlined,
-                          color: Colors.grey,
+                          // color: Colors.grey,
                         ),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscureText
                                 ? Icons.visibility_off
                                 : Icons.visibility,
-                            color: Colors.grey,
+                            // color: Colors.grey,
                           ),
                           onPressed: () {
                             setState(() {
@@ -271,7 +274,7 @@ class _SignupState extends State<Signup> {
                       'Phone Number',
                       style: TextStyle(
                         fontSize: 21,
-                        color: Colors.grey,
+                        // color: Colors.grey,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -287,7 +290,7 @@ class _SignupState extends State<Signup> {
                         hintText: 'Phone Number',
                         prefixIcon: Icon(
                           Icons.phone,
-                          color: Colors.grey,
+                          // color: Colors.grey,
                         ),
                       ),
                     ),
@@ -302,9 +305,9 @@ class _SignupState extends State<Signup> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Colors.black,
-                              Colors.grey,
-                              Colors.grey[300]!,
+                              Colors.teal,
+                              Color(0xFFB2EBF2),
+                              // Colors.white,
                             ],
                           ),
                           borderRadius: BorderRadius.circular(10),
@@ -327,7 +330,11 @@ class _SignupState extends State<Signup> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    Center(child: Text('OR')),
+                    Center(
+                        child: Text(
+                      'OR',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
                     SizedBox(height: 20),
                     Container(
                       width: double.infinity,
@@ -349,13 +356,13 @@ class _SignupState extends State<Signup> {
                           children: [
                             Icon(
                               Icons.g_mobiledata,
-                              color: Colors.grey,
+                              color: Colors.teal,
                             ),
                             SizedBox(width: 10),
                             Text(
                               'Login With Google',
                               style:
-                                  TextStyle(fontSize: 18, color: Colors.grey),
+                                  TextStyle(fontSize: 18, color: Colors.teal),
                             ),
                           ],
                         ),
@@ -368,7 +375,7 @@ class _SignupState extends State<Signup> {
                         Text(
                           "Already have an account?",
                           style: TextStyle(
-                            color: Colors.black,
+                            // color: Colors.black,
                             fontSize: 16.0,
                             fontWeight: FontWeight.w500,
                           ),
@@ -385,7 +392,7 @@ class _SignupState extends State<Signup> {
                           child: Text(
                             " Sign in",
                             style: TextStyle(
-                              color: Colors.grey,
+                              // color: Colors.grey,
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold,
                             ),

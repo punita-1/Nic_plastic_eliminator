@@ -1,106 +1,158 @@
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QuizGamePage extends StatefulWidget {
-  const QuizGamePage({super.key});
-
   @override
-  State<QuizGamePage> createState() => _QuizGamePageState();
+  _QuizGamePageState createState() => _QuizGamePageState();
 }
 
 class _QuizGamePageState extends State<QuizGamePage> {
-  int currentQuestion = 0;
+  List<Question> questions = [];
+  int currentQuestionIndex = 0;
   int score = 0;
-  List<Question> questions = generateQuestions();
-  Timer? _timer;
-  int _remainingTime = 60; // 60 seconds for the timer
-  late AudioPlayer _backgroundMusicPlayer;
-  final AudioCache _audioCache = AudioCache();
+  Timer? _timer; 
+  int _timeLeft = 60;
+
+  final AudioPlayer _soundPlayer = AudioPlayer();
+  final AudioPlayer _musicPlayer = AudioPlayer();
+  bool _soundEnabled = true;
+  bool _musicEnabled = true;
 
   @override
   void initState() {
     super.initState();
+    questions = generateQuestions();
     _startTimer();
-    _playBackgroundMusic();
+    _loadSettings();
   }
 
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
-        if (_remainingTime > 0) {
-          _remainingTime--;
+        if (_timeLeft > 0) {
+          _timeLeft--;
         } else {
-          _timer?.cancel();
-          _showScoreDialog();
+          _nextQuestion();
         }
       });
     });
   }
 
-  void _playBackgroundMusic() async {
+  void _resetTimer() {
+    setState(() {
+      _timeLeft = 60;
+    });
+  }
+
+  void _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _soundEnabled = prefs.getBool('soundEnabled') ?? true;
+      _musicEnabled = prefs.getBool('musicEnabled') ?? true;
+    });
+    _loadSounds();
+    _playBackgroundMusic();
+  }
+
+  Future<void> _saveSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('soundEnabled', _soundEnabled);
+    await prefs.setBool('musicEnabled', _musicEnabled);
+  }
+
+  void _loadSounds() async {
     try {
-      final player = AudioPlayer();
-      player.setReleaseMode(ReleaseMode.loop);
-      await player.setSource(AssetSource('Assets/Sounds/music.mp3'));
-      await player.resume();
-      _backgroundMusicPlayer = player;
+      await _soundPlayer.setAsset('Assets/Sounds/correct.mp3');
+      await _soundPlayer.setAsset('Assets/Sounds/wrong.mp3');
     } catch (e) {
-      print('Error playing background music: $e');
+      print('Error loading sound files: $e');
     }
   }
 
   Future<void> _playSound(String soundFileName) async {
-    try {
-      final player = AudioPlayer();
-      await player.setSource(AssetSource('Assets/Sounds/$soundFileName'));
-      await player.resume();
-    } catch (e) {
-      print('Error playing sound: $e');
-    }
-  }
-
-  void _answerQuestion(int selectedOption) async {
-    try {
-      if (questions[currentQuestion].correctOption == selectedOption) {
-        score++;
-        await _playSound('correct.mp3');
-      } else {
-        await _playSound('wrong.mp3');
+    if (_soundEnabled) {
+      try {
+        await _soundPlayer.setAsset('Assets/Sounds/$soundFileName');
+        _soundPlayer.play();
+      } catch (e) {
+        print('Error playing sound: $e');
       }
-      setState(() {
-        if (currentQuestion < questions.length - 1) {
-          currentQuestion++;
-        } else {
-          _timer?.cancel();
-          _showScoreDialog();
-        }
-      });
-    } catch (e) {
-      print('Error answering question: $e');
     }
   }
 
-  void _showScoreDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Quiz Completed'),
-        content: Text('Your score is $score/${questions.length}'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text(
-              'OK',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-        ],
+  void _playBackgroundMusic() async {
+    if (_musicEnabled) {
+      try {
+        await _musicPlayer.setAsset('Assets/Sounds/music.mp3');
+        _musicPlayer.setLoopMode(LoopMode.one);
+        _musicPlayer.play();
+      } catch (e) {
+        print('Error playing background music: $e');
+      }
+    }
+  }
+
+  void _stopBackgroundMusic() {
+    _musicPlayer.stop();
+  }
+
+  void _toggleBackgroundMusic() {
+    setState(() {
+      _musicEnabled = !_musicEnabled;
+      if (_musicEnabled) {
+        _playBackgroundMusic();
+      } else {
+        _stopBackgroundMusic();
+      }
+      _saveSettings();
+    });
+  }
+
+  void _nextQuestion() {
+    setState(() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        _resetTimer();
+      } else {
+        _endGame();
+      }
+    });
+  }
+
+  void _endGame() {
+    _timer?.cancel();
+    _showSnackBar('Game Over! Your Score: $score');
+  }
+
+  void _checkAnswer(int selectedOption) {
+    if (questions[currentQuestionIndex].correctOption == selectedOption) {
+      _playSound('correct.mp3');
+      setState(() {
+        score++;
+      });
+    } else {
+      _playSound('wrong.mp3');
+    }
+    _nextQuestion();
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _soundPlayer.dispose();
+    _musicPlayer.dispose();
+    super.dispose();
   }
 
   @override
@@ -112,117 +164,90 @@ class _QuizGamePageState extends State<QuizGamePage> {
           'Quiz Game',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _musicEnabled ? Icons.music_note : Icons.music_off,
+            ),
+            onPressed: _toggleBackgroundMusic,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Time Remaining: $_remainingTime seconds',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            Text(
-              questions[currentQuestion].questionText,
-              style: TextStyle(fontSize: 20),
-            ),
-            SizedBox(height: 16),
-            for (int i = 0; i < 3; i++)
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: getPastelColor(i),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
+            // Display score and timer
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Score: $score',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                onPressed: () {
-                  _answerQuestion(i);
-                  _showAnswerDialog(
-                    questions[currentQuestion].options[i],
-                    questions[currentQuestion].correctOption == i,
-                  );
-                },
-                child: Text(
-                  questions[currentQuestion].options[i],
-                  style: TextStyle(color: Colors.grey),
+                Text(
+                  'Time: $_timeLeft',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-              ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Text(
+              questions[currentQuestionIndex].question,
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 20),
+            Column(
+              children: questions[currentQuestionIndex].options.map((option) {
+                int index =
+                    questions[currentQuestionIndex].options.indexOf(option);
+                return ElevatedButton(
+                  onPressed: () => _checkAnswer(index),
+                  child: Text(option, style: TextStyle(color: Colors.teal),),
+                );
+              }).toList(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  void _showAnswerDialog(String selectedOption, bool isCorrect) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(isCorrect ? 'Correct!' : 'Wrong!'),
-        content: Text('You selected: $selectedOption'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text(
-              'OK',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-        ],
+  List<Question> generateQuestions() {
+    return [
+      Question(
+        question: 'What is the capital of France?',
+        options: ['Berlin', 'Madrid', 'Paris', 'Rome'],
+        correctOption: 2,
       ),
-    );
-  }
-
-  Color getPastelColor(int index) {
-    List<Color> pastelColors = [
-      Colors.white,
-      Colors.white,
-      Colors.white,
-      Colors.white,
-      Colors.white,
-      Colors.white,
-      Colors.white,
-      Colors.white,
-      Colors.white,
-      Colors.white,
+      Question(
+        question: 'Who wrote "To Kill a Mockingbird"?',
+        options: [
+          'Harper Lee',
+          'Mark Twain',
+          'Ernest Hemingway',
+          'F. Scott Fitzgerald'
+        ],
+        correctOption: 0,
+      ),
+      Question(
+        question: 'What is the chemical symbol for Hydrogen?',
+        options: ['H', 'O', 'N', 'C'],
+        correctOption: 0,
+      ),
+      // Add more questions here
     ];
-    return pastelColors[index % pastelColors.length];
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _backgroundMusicPlayer.dispose();
-    super.dispose();
   }
 }
 
 class Question {
-  final String questionText;
+  final String question;
   final List<String> options;
   final int correctOption;
 
   Question({
-    required this.questionText,
+    required this.question,
     required this.options,
     required this.correctOption,
   });
-}
-
-List<Question> generateQuestions() {
-  return [
-    Question(
-      questionText: 'Which of the following is biodegradable?',
-      options: ['Plastic Bag', 'Apple Core', 'Styrofoam Cup'],
-      correctOption: 1,
-    ),
-    Question(
-      questionText: 'Which material takes the longest to decompose?',
-      options: ['Glass', 'Paper', 'Food Waste'],
-      correctOption: 0,
-    ),
-    // Add more questions as needed
-  ];
 }

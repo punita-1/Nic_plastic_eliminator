@@ -1,6 +1,12 @@
 import 'dart:async';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:plastic_eliminator/pages/Home_page/quotes.dart';
+import 'package:plastic_eliminator/pages/clubs.dart';
+import 'package:plastic_eliminator/pages/profile_page/leader_board.dart';
+import 'package:plastic_eliminator/pages/profile_page/profile.dart';
+import 'package:plastic_eliminator/themes/theme_provider.dart';
+import 'package:share/share.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -21,9 +27,6 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:plastic_eliminator/pages/Home_page/shops_page/allshops.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/news.dart';
 import 'package:plastic_eliminator/pages/Home_page/shops_page/shoplist.dart';
-import 'package:plastic_eliminator/pages/Home_page/Activities_pages/calculator.dart';
-import 'package:plastic_eliminator/pages/extra_pages/games.dart';
-import 'package:plastic_eliminator/pages/Home_page/Activities_pages/gov_work.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/learn_pages/learn.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -37,9 +40,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Plastic Eliminator',
-      home: Scaffold(
-        body: const Home(),
-      ),
+      home: const Home(),
     );
   }
 }
@@ -72,14 +73,14 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
     _animationController.repeat();
 
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       int nextPage = (_pageController.page ?? 0).round() + 1;
       if (nextPage >= 3) {
         nextPage = 0;
       }
       _pageController.animateToPage(
         nextPage,
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
       );
     });
@@ -116,146 +117,649 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        leading: Container(
-            margin: EdgeInsets.only(left: 10),
-            child: Image.asset(
-              'Assets/logo_image/logo.png',
-              height: 40,
-            )),
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Icon(Icons.menu, color: Colors.white),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // Open the drawer
+              },
+            );
+          },
+        ),
         backgroundColor: Theme.of(context).colorScheme.secondary,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             SizedBox(width: 10.0),
-            // Text(
-            //   'PlasticEliminator',
-            //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            // ),
-            Text(AppLocalizations.of(context)!.plasticEliminator),
+            Text(
+              AppLocalizations.of(context)!.plasticEliminator,
+              style: Theme.of(context).textTheme.titleLarge,
+              textAlign: TextAlign.center,
+            ),
             Row(
               children: [
-                // IconButton(
-                //   icon: const Icon(Icons.language,
-                //       color: Color.fromARGB(188, 0, 0, 0)),
-                //   onPressed: () {
-                //     // Add language change functionality here
-                //   },
-                // ),
                 Column(
-                  mainAxisSize: MainAxisSize
-                      .min, // Ensure the Column only takes up as much vertical space as its children
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
-                      mainAxisSize: MainAxisSize
-                          .min, // Ensure the Row only takes up as much horizontal space as its children
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.language,
-                              color: Color.fromARGB(188, 0, 0, 0)),
+                          icon: Icon(Icons.language, color: Colors.white),
                           onPressed: () {
-                            final localeNotifier = Provider.of<LocaleNotifier>(
-                                context,
-                                listen: false);
-                            final currentLocale = localeNotifier.locale;
-
                             // Toggle between English and Hindi
-                            final newLocale = currentLocale.languageCode == 'en'
+                            final newLocale = context
+                                        .read<LocaleNotifier>()
+                                        .locale
+                                        .languageCode ==
+                                    'en'
                                 ? Locale('hi')
                                 : Locale('en');
-                            localeNotifier.setLocale(newLocale);
+                            context.read<LocaleNotifier>().setLocale(newLocale);
                           },
                         ),
-                        // Text(
-                        //   'en/hi',
-                        //   style: TextStyle(
-                        //       fontSize: 10), // Adjust font size as needed
-                        // ),
                       ],
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ],
         ),
       ),
+      drawer: Drawer(
+          child: ListView(padding: EdgeInsets.zero, children: <Widget>[
+        Container(
+          height: 260, // Adjust height as needed
+          color: Theme.of(context).colorScheme.secondary,
+          child: DrawerHeader(
+            margin: EdgeInsets.zero, // Remove default margin
+            padding: EdgeInsets.all(16.0), // Adjust padding if needed
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundImage: NetworkImage(
+                      photoURL ?? 'https://via.placeholder.com/150'),
+                  backgroundColor: Colors.grey[200],
+                ),
+                SizedBox(height: 15),
+                // SizedBox(height: 16), // Add spacing if needed
+                Text(
+                  userName ?? 'User',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    fontSize: 16, // Adjust font size as needed
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                // Add spacing if needed
+                Text(
+                  email ?? 'Email not available',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondary,
+                    fontSize: 14, // Adjust font size as needed
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                // SizedBox(height: 16), // Add spacing if needed
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            Profile(), // Navigate to the Profile page
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.visitProfile,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 15,
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LeaderboardPage(),
+              ),
+            );
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.leaderBoard,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.getInTouchWithUs,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        textAlign: TextAlign.start,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.list)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Club()));
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10), // Adds space between the image and text
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.clubs,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.joinClubsMakeADifference,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.group)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ShowAllNGOs()));
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10), // Adds space between the image and text
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.ngo,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.ourNGOPartners,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    ],
+                  ),
+                ),
+                Icon(Icons.handshake)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NewsPage(),
+              ),
+            );
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.news,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.getInTouchWithUs,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    ],
+                  ),
+                ),
+                Icon(Icons.pages)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LearningsGrid(),
+              ),
+            );
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.learning,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.getInTouchWithUs,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.book_outlined)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => About(),
+              ),
+            );
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.aboutUs,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.getInTouchWithUs,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    ],
+                  ),
+                ),
+                Icon(Icons.help_center_outlined)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            themeProvider.toggleTheme();
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.toggleTheme,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!
+                            .switchBetweenLightAndDarkMode,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    ],
+                  ),
+                ),
+                Icon(Icons.brightness_6),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            final appLink = 'https://example.com'; // Placeholder URL
+            Share.share('Check out this app: $appLink');
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.share,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.shareThisAppWithOthers,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    ],
+                  ),
+                ),
+                Icon(Icons.share)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FAQ(),
+              ),
+            );
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(
+                    width:
+                        10), // Adds space between the icon and text if needed
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.faqs,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.getInTouchWithUs,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    ],
+                  ),
+                ),
+                Icon(Icons.question_answer)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 8,
+        ),
+        ListTile(
+          contentPadding: EdgeInsets.all(0),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FeedbackPage(),
+              ),
+            );
+          },
+          title: Container(
+            margin: EdgeInsets.only(right: 20),
+            child: Row(
+              children: [
+                SizedBox(width: 10), // Adds space between the image and text
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.contactUs,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.start,
+                      ),
+                      Text(
+                        AppLocalizations.of(context)!.getInTouchWithUs,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    ],
+                  ),
+                ),
+                Icon(Icons.call)
+              ],
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 18,
+        ),
+      ])),
       body: Container(
         // margin: const EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
-              Container(
-                margin: EdgeInsets.only(left: 20, right: 20, top: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      child: Text(
-                        'Join Events to earn rewards',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 2,
-                    ),
-                    Container(
-                      child: Text(
-                        'more then millions of indians are changing for better',
-                        style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 4,
-                    ),
-                    Container(
-                      width: 390,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                      padding: const EdgeInsets.all(10.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Events()));
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+              // _buildHeader(),
+              Column(
+                children: [
+                  _buildHeader(),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.only(topLeft: Radius.circular(20))),
+                    child: Stack(
+                      children: [
+                        Container(
+                          color: Theme.of(context).colorScheme.secondary,
+                          height: 150,
+                          width: 500,
+                        ),
+                        Column(
                           children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              // crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Events\nGet Involved in Events, \nMake a Difference \nand Win Rewards!',
-                                  style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey,
+                            Container(
+                              margin:
+                                  EdgeInsets.only(left: 20, right: 20, top: 15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      child: Text(
+                                    AppLocalizations.of(context)!
+                                        .joinEventsToEarnRewards,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyLarge
+                                        ?.copyWith(color: Colors.white),
+                                    textAlign: TextAlign.center,
+                                  )),
+                                  SizedBox(
+                                    height: 2,
                                   ),
-                                ),
-                              ],
+                                  Container(
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .moreThanMillionsOfIndians,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(color: Colors.white),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  ),
+                                  Container(
+                                    width: 390,
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(50),
+                                          bottomRight: Radius.circular(50)),
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Events()));
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            // crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .events,
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium,
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Text(AppLocalizations.of(
+                                                          context)!
+                                                      .getInvolvedInEvents),
+                                                  Text(
+                                                    AppLocalizations.of(
+                                                            context)!
+                                                        .andWinRewards,
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          Container(
+                                            height: 100,
+                                            child: Lottie.asset(
+                                                'Animations/Animation1.json'),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10.0),
+                                  const SizedBox(height: 10),
+                                  _buildContent(),
+                                ],
+                              ),
                             ),
-                            Lottie.asset(
-                                'Animations/Animation - 1722421094685 (1).json')
                           ],
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(height: 10.0),
-                    const SizedBox(height: 10),
-                    _buildContent(),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -268,17 +772,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Stack(
       children: [
         SizedBox(
-          height: 190.0,
+          height: 165.0,
           child: SwiperPage(pageController: _pageController),
-        ),
-        Container(
-          margin: const EdgeInsets.only(top: 40, left: 20, right: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // const SizedBox(height: 10),
-            ],
-          ),
         ),
       ],
     );
@@ -289,167 +784,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          child: Text(
-            'Top Picks',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          width: MediaQuery.of(context).size.width, // Full width of the screen
+          height: 60, // Fixed height
+          child: QuotesWidget(),
         ),
-        const SizedBox(height: 15.0),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Categories()));
-                      },
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              'Assets/images/government.png',
-                              height: 30,
-                            ),
-                            Text(
-                              'Transform Plastic Waste!',
-                              style: TextStyle(
-                                fontSize: 10.0,
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).colorScheme.tertiary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Tutorials',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Maps()));
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'Assets/images/government.png',
-                            height: 30,
-                          ),
-                          Text(
-                            'Plastic Drop-off points',
-                            style: TextStyle(
-                              fontSize: 10.0,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.tertiary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'Nearby',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10.0),
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ShowAllNGOs()));
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'Assets/images/government.png',
-                            height: 30,
-                          ),
-                          Text(
-                            'Our NGO Partners',
-                            style: TextStyle(
-                              fontSize: 10.0,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).colorScheme.tertiary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'NGO',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.tertiary,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 15.0),
+        SizedBox(height: 10.0),
         Container(
           height: 260,
           child: ActivitiesPage(),
@@ -463,19 +802,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Shops',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  AppLocalizations.of(context)!.shops,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  textAlign: TextAlign.center,
                 ),
-                Text(
-                  "Let's Support Plastic free Shopping",
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                SizedBox(
+                  height: 3,
                 ),
               ],
             ),
             InkWell(
               child: Text(
-                'Show All',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                AppLocalizations.of(context)!.showAll,
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
               ),
               onTap: () {
                 Navigator.push(
@@ -486,80 +826,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ),
           ],
         ),
+        Text(
+          AppLocalizations.of(context)!.letsSupportPlasticFreeShopping,
+          style: Theme.of(context).textTheme.bodyMedium,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 15.0),
         ShopList(),
         SizedBox(height: 10.0),
         Container(height: 190, child: SwiperPageNew()),
         SizedBox(
           height: 10,
-        ),
-        Container(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20))),
-                height: 40,
-                width: 100,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => About()), // Remove 'const'
-                    );
-                  },
-                  child: Center(
-                      child:
-                          Text('About Us', style: TextStyle(fontSize: 14.0))),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20))),
-                height: 40,
-                width: 100,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              FeedbackPage()), // Remove 'const'
-                    );
-                  },
-                  child: Center(
-                      child:
-                          Text('Contact Us', style: TextStyle(fontSize: 14.0))),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20))),
-                height: 40,
-                width: 100,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => FAQ()));
-                  },
-                  child: Center(
-                      child: Text('FAQs', style: TextStyle(fontSize: 14.0))),
-                ),
-              ),
-            ],
-          ),
         ),
         SizedBox(
           height: 20,
@@ -577,34 +854,29 @@ class EventPage extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.secondary,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 20,
-          ),
+          // SizedBox(
+          //   width: 20,
+          // ),
           Container(
-            margin: EdgeInsets.only(top: 50),
-            child: Column(
-              children: [
-                // Text(
-                //   'Plastic-free planet',
-                //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                // ),
-                Text(AppLocalizations.of(context)!.plasticFreePlanet),
-                Text(AppLocalizations.of(context)!.startsWithYou),
-                // Text(
-                //   'starts with you',
-                //   style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-                // ),
-              ],
+              // margin: EdgeInsets.only(top: 10),
+              child: Text(
+            AppLocalizations.of(context)!.discoverExcitingEventsPlus,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-          ),
+            textAlign: TextAlign.center,
+          )),
           SizedBox(
-            width: 22,
+            width: 10,
           ),
           Container(
               height: 95,
-              child: Image(
-                  image: AssetImage('Assets/home_images/swiper_bottle.png'))),
+              child:
+                  Image(image: AssetImage('Assets/logo_image/onboardin1.png'))),
         ],
       ),
     );
@@ -619,32 +891,24 @@ class ContactPage extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.secondary,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 20,
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 50),
-            child: Column(
-              children: [
-                Text(
-                  'Small actions today,',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'for a plastic-free tomorrow',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+          Text(
+            AppLocalizations.of(context)!
+                .bePartOfClubsCommittedToReducingPlasticWaste,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(color: Colors.white),
+            textAlign: TextAlign.center,
           ),
           SizedBox(
-            width: 5,
+            width: 10,
           ),
           Container(
               height: 100,
-              child: Image(
-                  image: AssetImage('Assets/home_images/swiper_turtle.png'))),
+              child:
+                  Image(image: AssetImage('Assets/logo_image/onboard2.png'))),
         ],
       ),
     );
@@ -657,34 +921,30 @@ class Blue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).colorScheme.secondary,
+      decoration: BoxDecoration(
+        // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8)),
+        color: Theme.of(context).colorScheme.secondary,
+      ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 20,
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 50),
-            child: Column(
-              children: [
-                Text(
-                  'Clean Oceans,',
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Brighter Future',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+          Text(
+            AppLocalizations.of(context)!.greenYourShopping +
+                '\n' +
+                AppLocalizations.of(context)!.discoverPlasticFreeBrands,
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(color: Colors.white),
+            textAlign: TextAlign.center,
           ),
           SizedBox(
-            width: 20,
+            width: 10,
           ),
           Container(
               height: 120,
               child: Image(
-                  image: AssetImage('Assets/home_images/swiper_water.png'))),
+                  image: AssetImage('Assets/logo_image/onboarding3.png'))),
         ],
       ),
     );
@@ -700,10 +960,9 @@ class SwiperPage extends StatelessWidget {
     return Stack(
       children: [
         ClipRRect(
-          borderRadius:
-              const BorderRadius.only(bottomRight: Radius.elliptical(800, 250)),
           child: PageView(
             controller: pageController,
+            scrollDirection: Axis.vertical,
             children: const [
               EventPage(),
               ContactPage(),
@@ -711,83 +970,7 @@ class SwiperPage extends StatelessWidget {
             ],
           ),
         ),
-        Positioned(
-          bottom: 8.0,
-          left: 20,
-          // right: 100.0,
-          child: Center(
-            child: SmoothPageIndicator(
-              controller: pageController,
-              count: 3,
-              effect: CustomizableEffect(
-                activeDotDecoration: DotDecoration(
-                  color: Colors.grey[600]!, // Active dot color
-                  // size: Size(12, 12),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                dotDecoration: DotDecoration(
-                  color: Colors.grey, // Inactive dot color
-                  // size: Size(8, 8),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                spacing: 8,
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
-}
-
-Widget _buildActivityContainer(String label, ImageProvider image) {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.orange[200], // Background color
-      borderRadius: BorderRadius.circular(10), // Rounded corners
-    ),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  color: Colors.transparent, // Make the container transparent
-                ),
-                child: Center(
-                  child: Image(
-                    image: image,
-                    width: 35, // Image width
-                    height: 35, // Image height
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        // Bottom label
-        Container(
-          color: Colors.blue[200], // Background color for label
-          width: double.infinity,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
-      ],
-    ),
-  );
 }

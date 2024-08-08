@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:plastic_eliminator/pages/Home_page/Activities_pages/calculator/plastic_final/plastic_dose_form.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Calculator extends StatelessWidget {
   const Calculator({super.key});
@@ -18,12 +20,31 @@ class Calculator extends StatelessWidget {
         children: [
           _buildNavigationButton(
               context, 'Bottle Calculator', const BottleCalculator()),
-          const SizedBox(height: 16.0), // Add spacing between buttons
+          const SizedBox(height: 16.0),
           _buildNavigationButton(
               context, 'Polybag Calculator', const PolybagCalculator()),
-          const SizedBox(height: 16.0), // Add spacing between buttons
+          const SizedBox(height: 16.0),
           _buildNavigationButton(context, 'Vegetable Waste Calculator',
               const VegetableWasteCalculator()),
+          const SizedBox(height: 16.0),
+          ElevatedButton(
+            onPressed: () async {
+              // Navigate to PlasticDoseScreen with current user ID
+              User? user = FirebaseAuth.instance.currentUser;
+              if (user != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PlasticUsageForm()),
+                );
+              } else {
+                // Handle the case when the user is not signed in
+              }
+            },
+            child: Text(
+              'Track Plastic Dose',
+              style: TextStyle(color: Colors.teal),
+            ),
+          ),
         ],
       ),
     );
@@ -32,9 +53,9 @@ class Calculator extends StatelessWidget {
   Widget _buildNavigationButton(
       BuildContext context, String label, Widget page) {
     return Container(
-      margin: const EdgeInsets.only(top: 2.0), // Margin around each button
+      margin: const EdgeInsets.only(top: 2.0),
       decoration: BoxDecoration(
-        color: Colors.white, // Pastel color for container
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
         boxShadow: [],
       ),
@@ -46,11 +67,8 @@ class Calculator extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          // backgroundColor:
-          //     const Color.fromARGB(255, 248, 187, 225), // Button color
-          padding: const EdgeInsets.symmetric(
-              vertical: 20.0, horizontal: 16.0), // Button padding
-          textStyle: const TextStyle(fontSize: 18), // Button text size
+          padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+          textStyle: const TextStyle(fontSize: 18),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
@@ -58,8 +76,7 @@ class Calculator extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-            color: Colors.grey,
-            // color: Color.fromARGB(255, 173, 20, 153), // Button text color
+            color: Colors.teal,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -108,97 +125,94 @@ class _BottleCalculatorState extends State<BottleCalculator> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        // backgroundColor: Colors.teal[100]!,
         title: Text(
           'Bottle Calculator',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Container(
-        // color: Colors.pink[50],
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Choose Bottle Size:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  // color: Colors.pink[700]
-                )),
-            Row(
-              children: [
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('50ml Bottle',
-                        style: TextStyle(
-                          fontSize: 16,
-                          // color: Colors.pink[600]
-                        )),
-                    value: '50ml',
-                    groupValue: _selectedBottleSize,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedBottleSize = value!;
-                      });
-                    },
-                    activeColor: Colors.black,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Choose Bottle Size:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  )),
+              Row(
+                children: [
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: Text('50ml Bottle',
+                          style: TextStyle(
+                            fontSize: 16,
+                          )),
+                      value: '50ml',
+                      groupValue: _selectedBottleSize,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedBottleSize = value!;
+                        });
+                      },
+                      activeColor: Colors.black,
+                    ),
+                  ),
+                  Expanded(
+                    child: RadioListTile<String>(
+                      title: Text('1 Litre Bottle',
+                          style: TextStyle(
+                            fontSize: 16,
+                          )),
+                      value: '1L',
+                      groupValue: _selectedBottleSize,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedBottleSize = value!;
+                        });
+                      },
+                      activeColor: Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20.0),
+              _buildTextField(
+                controller: _controllerBottle,
+                label: 'Number of Bottles',
+                color: Colors.white,
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: calc,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 10), // Button height
+                  textStyle: const TextStyle(fontSize: 18), // Button text size
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        8.0), // Adjust this value for less curve
                   ),
                 ),
-                Expanded(
-                  child: RadioListTile<String>(
-                    title: Text('1 Litre Bottle',
-                        style: TextStyle(
-                          fontSize: 16,
-                          // color: Colors.pink[600]
-                        )),
-                    value: '1L',
-                    groupValue: _selectedBottleSize,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedBottleSize = value!;
-                      });
-                    },
-                    activeColor: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20.0),
-            _buildTextField(
-              controller: _controllerBottle,
-              label: 'Number of Bottles',
-              color: Colors.white,
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: calc,
-              style: ElevatedButton.styleFrom(
-                // backgroundColor: Colors.pink[300], // Button color
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 10), // Button height
-                textStyle: const TextStyle(fontSize: 18), // Button text size
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      8.0), // Adjust this value for less curve
+                child: const Text(
+                  'Calculate Degradation Time',
+                  style: TextStyle(color: Colors.teal),
                 ),
               ),
-              child: const Text(
-                'Calculate Degradation Time',
-                style: TextStyle(color: Colors.grey),
+              const SizedBox(height: 20.0),
+              Text(
+                _result,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              _result,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              _reason,
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
+              const SizedBox(height: 20.0),
+              Text(
+                _reason,
+                style: const TextStyle(fontSize: 18, color: Colors.teal),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -255,52 +269,52 @@ class _PolybagCalculatorState extends State<PolybagCalculator> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        // backgroundColor: Colors.teal[100]!,
         title: Text(
           'Polybag Calculator',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Container(
-        // color: Colors.lime[50],
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTextField(
-              controller: _controllerPolybag,
-              label: 'Number of Polybags',
-              color: Colors.white,
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: calc,
-              style: ElevatedButton.styleFrom(
-                // backgroundColor: Colors.lime[300], // Button color
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 10), // Button height
-                textStyle: const TextStyle(fontSize: 18), // Button text size
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      8.0), // Adjust this value for less curve
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField(
+                controller: _controllerPolybag,
+                label: 'Number of Polybags',
+                color: Colors.white,
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: calc,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 10), // Button height
+                  textStyle: const TextStyle(fontSize: 18), // Button text size
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        8.0), // Adjust this value for less curve
+                  ),
+                ),
+                child: const Text(
+                  'Calculate Degradation Time',
+                  style: TextStyle(color: Colors.teal),
                 ),
               ),
-              child: const Text(
-                'Calculate Degradation Time',
-                style: TextStyle(color: Colors.grey),
+              const SizedBox(height: 20.0),
+              Text(
+                _result,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              _result,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              _reason,
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
+              const SizedBox(height: 20.0),
+              Text(
+                _reason,
+                style: const TextStyle(fontSize: 18, color: Colors.teal),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -339,8 +353,7 @@ class _VegetableWasteCalculatorState extends State<VegetableWasteCalculator> {
   String _result = '';
   String _reason = '';
 
-  final double _vegetableWasteDegradationTime =
-      1; // Vegetable waste degrades in a year
+  final double _vegetableWasteDegradationTime = 0.5;
 
   void calc() {
     final int vegetableWasteCount =
@@ -352,7 +365,7 @@ class _VegetableWasteCalculatorState extends State<VegetableWasteCalculator> {
       _result =
           'Total Degradation Time for Vegetable Waste: ${totalVegetableWasteTime.toStringAsFixed(2)} years';
       _reason =
-          'Vegetable waste, which includes food scraps and peels, generally decomposes quickly due to its organic nature. The degradation time for vegetable waste is typically around 1 year. This relatively short degradation period is due to the high moisture content and organic compounds that support microbial activity, leading to faster breakdown and composting of the waste.';
+          'Vegetable waste is composed primarily of organic materials that are easily broken down by microorganisms. The degradation process involves the action of bacteria, fungi, and other decomposers that break down complex organic compounds into simpler substances. This process, known as biodegradation, is relatively quick compared to plastic degradation. Vegetable waste typically decomposes within 3 to 6 months, depending on environmental conditions such as temperature, moisture, and the presence of decomposing organisms.';
     });
   }
 
@@ -361,51 +374,52 @@ class _VegetableWasteCalculatorState extends State<VegetableWasteCalculator> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        // backgroundColor: Colors.teal[100]!,
         title: Text(
           'Vegetable Waste Calculator',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Container(
-        // color: Colors.lime[50],
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildTextField(
-              controller: _controllerVegetableWaste,
-              label: 'Number of Vegetable Waste Items',
-              color: Colors.white,
-            ),
-            const SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: calc,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 20.0, horizontal: 10), // Button height
-                textStyle: const TextStyle(fontSize: 18), // Button text size
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      8.0), // Adjust this value for less curve
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField(
+                controller: _controllerVegetableWaste,
+                label: 'Weight of Vegetable Waste (kg)',
+                color: Colors.white,
+              ),
+              const SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: calc,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 10), // Button height
+                  textStyle: const TextStyle(fontSize: 18), // Button text size
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        8.0), // Adjust this value for less curve
+                  ),
+                ),
+                child: const Text(
+                  'Calculate Degradation Time',
+                  style: TextStyle(color: Colors.teal),
                 ),
               ),
-              child: const Text(
-                'Calculate Degradation Time',
-                style: TextStyle(color: Colors.grey),
+              const SizedBox(height: 20.0),
+              Text(
+                _result,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              _result,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20.0),
-            Text(
-              _reason,
-              style: const TextStyle(fontSize: 18),
-            ),
-          ],
+              const SizedBox(height: 20.0),
+              Text(
+                _reason,
+                style: const TextStyle(fontSize: 18, color: Colors.teal),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -47,7 +47,8 @@
 //         children: [
 //           Text(
 //             'New in PlasticEliminator',
-//             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+//             style: Theme.of(context).textTheme.bodyLarge,
+//             textAlign: TextAlign.center,
 //           ),
 //           SizedBox(
 //             height: 10,
@@ -57,16 +58,31 @@
 //             child: PageView(
 //               controller: _pageController,
 //               children: [
-//                 _buildPage('Upcomming Features',
-//                     Theme.of(context).colorScheme.primary),
 //                 _buildPage(
-//                     'Page 2: Contact', Theme.of(context).colorScheme.primary),
+//                   'Upcomming Features',
+//                   Theme.of(context).colorScheme.primary,
+//                   Colors.black, // Text color for 'Upcomming Features'
+//                 ),
 //                 _buildPage(
-//                     'Page 3: Feedback', Theme.of(context).colorScheme.primary),
+//                   'Upcomming Features',
+//                   Theme.of(context).colorScheme.primary,
+//                   Colors.black, // Text color for other pages
+//                 ),
 //                 _buildPage(
-//                     'Page 4: Tutorials', Theme.of(context).colorScheme.primary),
+//                   'Upcomming Features',
+//                   Theme.of(context).colorScheme.primary,
+//                   Colors.black, // Text color for other pages
+//                 ),
 //                 _buildPage(
-//                     'Page 5: Map', Theme.of(context).colorScheme.primary),
+//                   'Upcomming Features\nAchievements',
+//                   Theme.of(context).colorScheme.primary,
+//                   Colors.black, // Text color for other pages
+//                 ),
+//                 _buildPage(
+//                   'Upcomming Features\nSccaner',
+//                   Theme.of(context).colorScheme.primary,
+//                   Colors.black, // Text color for other pages
+//                 ),
 //               ],
 //             ),
 //           ),
@@ -75,13 +91,14 @@
 //     );
 //   }
 
-//   Widget _buildPage(String title, Color color) {
+//   Widget _buildPage(String title, Color backgroundColor, Color textColor) {
 //     return Container(
-//       color: color,
+//       color: backgroundColor,
 //       child: Center(
 //         child: Text(
 //           title,
-//           style: TextStyle(fontSize: 24, color: Colors.white),
+//           style: Theme.of(context).textTheme.bodyLarge,
+//           textAlign: TextAlign.center,
 //         ),
 //       ),
 //     );
@@ -89,6 +106,7 @@
 // }
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Import for localization
 
 class SwiperPageNew extends StatefulWidget {
   const SwiperPageNew({super.key});
@@ -130,13 +148,26 @@ class _SwiperPageNewState extends State<SwiperPageNew> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations =
+        AppLocalizations.of(context)!; // Use the localization instance
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'New in PlasticEliminator',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              Text(
+                localizations.plasticEliminator,
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                localizations.newInPlasticEliminator,
+                style: Theme.of(context).textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
           SizedBox(
             height: 10,
@@ -147,29 +178,29 @@ class _SwiperPageNewState extends State<SwiperPageNew> {
               controller: _pageController,
               children: [
                 _buildPage(
-                  'Upcomming Features',
+                  localizations.upcomingFeatures,
                   Theme.of(context).colorScheme.primary,
-                  Colors.black, // Text color for 'Upcomming Features'
+                  Colors.black,
                 ),
                 _buildPage(
-                  'Upcomming Features',
+                  localizations.upcomingFeatures,
                   Theme.of(context).colorScheme.primary,
-                  Colors.black, // Text color for other pages
+                  Colors.black,
                 ),
                 _buildPage(
-                  'Upcomming Features',
+                  localizations.upcomingFeatures,
                   Theme.of(context).colorScheme.primary,
-                  Colors.black, // Text color for other pages
+                  Colors.black,
                 ),
                 _buildPage(
-                  'Upcomming Features',
+                  localizations.upcomingFeaturesAchievements,
                   Theme.of(context).colorScheme.primary,
-                  Colors.black, // Text color for other pages
+                  Colors.black,
                 ),
                 _buildPage(
-                  'Upcomming Features',
+                  localizations.upcomingFeaturesScanner,
                   Theme.of(context).colorScheme.primary,
-                  Colors.black, // Text color for other pages
+                  Colors.black,
                 ),
               ],
             ),
@@ -185,7 +216,9 @@ class _SwiperPageNewState extends State<SwiperPageNew> {
       child: Center(
         child: Text(
           title,
-          style: TextStyle(fontSize: 24, color: textColor),
+          style:
+              Theme.of(context).textTheme.bodyLarge?.copyWith(color: textColor),
+          textAlign: TextAlign.center,
         ),
       ),
     );

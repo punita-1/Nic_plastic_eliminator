@@ -32,18 +32,49 @@ class _ProfileState extends State<Profile> {
   String email = 'Email not available';
   String phoneNumber = 'Phone number not provided';
   String photoURL = 'https://via.placeholder.com/150';
+  String clubName = 'No Club Selected'; // Added field for club name
   final TextEditingController _usernameController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   List<Map<String, dynamic>> _registeredEvents = [];
+  int totalLikes = 0;
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
     _loadRegisteredEvents();
+    _calculateTotalLikesAndUpdateState();
+  }
+
+  Future<void> _calculateTotalLikesAndUpdateState() async {
+    final likes = await _calculateTotalLikes();
+    setState(() {
+      totalLikes = likes;
+    });
+  }
+
+  Future<int> _calculateTotalLikes() async {
+    if (currentUser == null) return 0;
+
+    try {
+      final postsSnapshot = await FirebaseFirestore.instance
+          .collection('UserMediaPosts')
+          .where('UserEmail', isEqualTo: currentUser!.email)
+          .get();
+
+      int totalLikes = 0;
+      for (var doc in postsSnapshot.docs) {
+        final postData = doc.data() as Map<String, dynamic>;
+        totalLikes += (postData['Likes'] as int?) ?? 0;
+      }
+      return totalLikes;
+    } catch (e) {
+      print('Error calculating total likes: $e');
+      return 0;
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -61,6 +92,8 @@ class _ProfileState extends State<Profile> {
             photoURL = userDoc.data()?['profileImageUrl'] ??
                 currentUser!.photoURL ??
                 'https://via.placeholder.com/150';
+            clubName = userDoc.data()?['club'] ??
+                'No Club Selected'; // Fetch club name
             _usernameController.text = userName;
           });
         }
@@ -311,11 +344,19 @@ class _ProfileState extends State<Profile> {
                   color: Colors.grey,
                 ),
               ),
+              const SizedBox(height: 8),
+              Text(
+                '$clubName', // Display club name here
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  // color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: TextField(
@@ -323,52 +364,67 @@ class _ProfileState extends State<Profile> {
                   decoration: InputDecoration(
                     labelText: 'Username',
                     border: InputBorder.none,
-                    prefixIcon: Icon(Icons.person, color: Colors.grey),
+                    prefixIcon: Icon(Icons.person),
                     suffixIcon: IconButton(
-                      icon: const Icon(Icons.save, color: Colors.grey),
+                      icon: const Icon(
+                        Icons.save,
+                      ),
                       onPressed: _updateUserName,
                     ),
                   ),
                 ),
               ),
+              Text(
+                'Total Likes: $totalLikes',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _logout,
-                style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                  textStyle: Theme.of(context).textTheme.bodyMedium,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(8), // Adjust this value as needed
-                  ),
-                ),
-                child: const Text(
-                  'Logout',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
+              // ElevatedButton(
+              //   onPressed: _logout,
+              //   style: ElevatedButton.styleFrom(
+              //     padding:
+              //         const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              //     textStyle: Theme.of(context).textTheme.bodyMedium,
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius:
+              //           BorderRadius.circular(8), // Adjust this value as needed
+              //     ),
+              //   ),
+              //   child: const Text(
+              //     'Logout',
+              //     style: TextStyle(color: Colors.teal),
+              //   ),
+              // ),
               const SizedBox(height: 24), // Add spacing before the new button
-              TextButton(
-                onPressed: _logoutAndGoToAdminLogin,
-                child: const Text(
-                  'Are you an admin?',
-                  style: TextStyle(color: Colors.grey),
-                ),
-              ),
-              Center(child: Text('Registered Events')),
+
+              Center(child: Text('Registered Events', style: TextStyle(fontSize: 20),)),
               const SizedBox(height: 24),
               if (_registeredEvents.isNotEmpty)
                 ..._registeredEvents
-                    .map((event) => ListTile(
-                          title: Text(
-                              event['Name'] ?? 'No Event Name'), // Event name
-                          subtitle: Text(
-                              event['Date'] ?? 'No Event Date'), // Event date
+                    .map((event) => Column(
+                          children: [
+                            ListTile(
+                              title: Text(event['Name'] ??
+                                  'No Event Name'), // Event name
+                              subtitle: Text(event['Date'] ??
+                                  'No Event Date'), // Event date
+                            ),
+                            Divider(),
+                          ],
                         ))
                     .toList()
               else
                 Text('No events registered.'),
+              TextButton(
+                onPressed: _logoutAndGoToAdminLogin,
+                child: const Text(
+                  'Are you an admin?',
+                  style: TextStyle(color: Colors.teal),
+                ),
+              ),
             ],
           ),
         ),

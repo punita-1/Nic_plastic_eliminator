@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -8,44 +9,58 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool notificationsEnabled = true;
-  bool soundEnabled = true;
+  bool _soundEnabled = true;
+  bool _musicEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _soundEnabled = prefs.getBool('soundEnabled') ?? true;
+      _musicEnabled = prefs.getBool('musicEnabled') ?? true;
+    });
+  }
+
+  Future<void> _saveSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('soundEnabled', _soundEnabled);
+    await prefs.setBool('musicEnabled', _musicEnabled);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          'Settings',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
+        title: Text('Settings'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SwitchListTile(
-              title: const Text('Allow Notifications'),
-              value: notificationsEnabled,
-              onChanged: (bool value) {
-                setState(() {
-                  notificationsEnabled = value;
-                });
-              },
-            ),
-            SwitchListTile(
-              title: const Text('Allow Sound'),
-              value: soundEnabled,
-              onChanged: (bool value) {
-                setState(() {
-                  soundEnabled = value;
-                });
-              },
-            ),
-          ],
-        ),
+      body: ListView(
+        children: [
+          SwitchListTile(
+            title: Text('Sound'),
+            value: _soundEnabled,
+            onChanged: (bool value) {
+              setState(() {
+                _soundEnabled = value;
+              });
+              _saveSettings(); // Save setting when toggled
+            },
+          ),
+          SwitchListTile(
+            title: Text('Background Music'),
+            value: _musicEnabled,
+            onChanged: (bool value) {
+              setState(() {
+                _musicEnabled = value;
+              });
+              _saveSettings(); // Save setting when toggled
+            },
+          ),
+        ],
       ),
     );
   }

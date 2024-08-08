@@ -166,8 +166,8 @@ class _PostsState extends State<Posts> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(10),
-      padding: const EdgeInsets.all(10),
+      // margin: const EdgeInsets.all(10),
+      // padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.primary,
         borderRadius: BorderRadius.circular(15),
@@ -175,17 +175,16 @@ class _PostsState extends State<Posts> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 290,
-                child: Text(
-                  widget.message,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.tertiary),
+              Text(
+                widget.user,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
+                // style: TextStyle(color: Colors.black),
               ),
               if (widget.user == currentUser.email)
                 DeleteButton(
@@ -193,41 +192,40 @@ class _PostsState extends State<Posts> {
                 ),
             ],
           ),
+          Container(
+            width: 260,
+            child: Text(
+              widget.message,
+              style: TextStyle(color: Colors.teal
+                  // Theme.of(context).colorScheme.tertiary
+                  ),
+            ),
+          ),
           SizedBox(
             height: 10,
           ),
-          Row(
-            children: [
-              Text(
-                widget.user,
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              Text(
-                " . ",
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-              Text(
-                widget.time,
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-            ],
+          Text(
+            widget.time,
+            // style: TextStyle(color: Colors.black),
           ),
           SizedBox(height: 10),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+            // mainAxisAlignment: MainAxisAlignment.end,
+            // crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
+              Row(
                 children: [
                   LikeButton(isliked: isLiked, onTap: toggleLike),
+                  SizedBox(
+                    width: 10,
+                  ),
                   Text(
                     widget.likes.length.toString(),
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: Colors.black),
                   ),
                 ],
-              ),
-              SizedBox(
-                width: 5,
               ),
               StreamBuilder<int>(
                 stream: getCommentCountStream(),
@@ -243,33 +241,33 @@ class _PostsState extends State<Posts> {
                           });
                         },
                       ),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero, // Remove padding
-                          minimumSize:
-                              Size(0, 0), // Remove minimum size constraints
-                          tapTargetSize: MaterialTapTargetSize
-                              .shrinkWrap, // Shrink tap area
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            areCommentsVisible = !areCommentsVisible;
-                          });
-                        },
-                        child: Text(
-                          '$commentCount',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ),
+                      // TextButton(
+                      //   style: TextButton.styleFrom(
+                      //     padding: EdgeInsets.zero, // Remove padding
+                      //     minimumSize:
+                      //         Size(0, 0), // Remove minimum size constraints
+                      //     tapTargetSize: MaterialTapTargetSize
+                      //         .shrinkWrap, // Shrink tap area
+                      //   ),
+                      //   onPressed: () {
+                      //     setState(() {
+                      //       areCommentsVisible = !areCommentsVisible;
+                      //     });
+                      //   },
+                      // child: Text(
+                      //   '$commentCount',
+                      //   style: TextStyle(color: Colors.black),
+                      // ),
+                      // ),
                     ],
                   );
                 },
               ),
             ],
           ),
-          SizedBox(
-            height: 5,
-          ),
+          // SizedBox(
+          //   height: 5,
+          // ),
           Visibility(
             visible: areCommentsVisible,
             child: Column(
@@ -301,10 +299,14 @@ class _PostsState extends State<Posts> {
                     );
                   },
                 ),
-                SizedBox(height: 10),
-                IconButton(
-                  icon: Icon(Icons.add, color: Colors.grey[600]),
-                  onPressed: showCommentDialog,
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.add),
+                      onPressed: showCommentDialog,
+                    ),
+                    Text('Add Comment'),
+                  ],
                 ),
               ],
             ),

@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:plastic_eliminator/pages/Home_page/Activities_pages/calculator.dart';
+import 'package:plastic_eliminator/pages/Home_page/Activities_pages/calculator/calculator.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/challenge_home.dart';
-// import 'package:plastic_eliminator/pages/extra_pages/game_home.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/games/games_home.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/gov_work.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/learn_pages/learn.dart';
 import 'package:plastic_eliminator/pages/Home_page/Activities_pages/news.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Correct localization import
 
 class ActivitiesPage extends StatelessWidget {
   const ActivitiesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localizations =
+        AppLocalizations.of(context)!; // Use the localization instance
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Activities',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            localizations.activities,
+            style: Theme.of(context).textTheme.bodyLarge,
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: 16),
           Column(
@@ -27,19 +31,18 @@ class ActivitiesPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _ActivityContainer(
-                    text: 'Challenges',
-                    imagePath: 'Assets/images/government.png',
+                    text: localizations.challenges,
+                    imagePath: 'Assets/images/challenge.png',
                     destinationPage: ChallengeHome(),
+                    textStyle: Theme.of(context).textTheme.bodyLarge!,
+                    textAlign: TextAlign.center,
                   ),
                   _ActivityContainer(
-                    text: 'Government',
+                    text: localizations.government,
                     imagePath: 'Assets/images/government.png',
                     destinationPage: PlasticSectionPage(),
-                  ),
-                  _ActivityContainer(
-                    text: 'Games',
-                    imagePath: 'Assets/images/government.png',
-                    destinationPage: Game_Home(),
+                    textStyle: Theme.of(context).textTheme.bodyLarge!,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -50,19 +53,18 @@ class ActivitiesPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _ActivityContainer(
-                    text: 'News',
-                    imagePath: 'Assets/images/government.png',
-                    destinationPage: NewsPage(),
+                    text: localizations.games,
+                    imagePath: 'Assets/images/console.png',
+                    destinationPage: Game_Home(),
+                    textStyle: Theme.of(context).textTheme.bodyLarge!,
+                    textAlign: TextAlign.center,
                   ),
                   _ActivityContainer(
-                    text: 'Calculator',
-                    imagePath: 'Assets/images/government.png',
+                    text: localizations.calculator,
+                    imagePath: 'Assets/images/calculator.png',
                     destinationPage: Calculator(),
-                  ),
-                  _ActivityContainer(
-                    text: 'Learn',
-                    imagePath: 'Assets/images/government.png',
-                    destinationPage: LearningsGrid(),
+                    textStyle: Theme.of(context).textTheme.bodyLarge!,
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -78,11 +80,15 @@ class _ActivityContainer extends StatelessWidget {
   final String text;
   final String imagePath;
   final Widget destinationPage;
+  final TextStyle textStyle;
+  final TextAlign textAlign;
 
   const _ActivityContainer({
     required this.text,
     required this.imagePath,
     required this.destinationPage,
+    required this.textStyle,
+    required this.textAlign,
   });
 
   @override
@@ -96,7 +102,7 @@ class _ActivityContainer extends StatelessWidget {
       },
       child: Container(
         height: 100,
-        width: 100,
+        width: 150,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(10),
@@ -112,8 +118,8 @@ class _ActivityContainer extends StatelessWidget {
             SizedBox(height: 8),
             Text(
               text,
-              style: TextStyle(color: Theme.of(context).colorScheme.tertiary),
-              textAlign: TextAlign.center,
+              style: textStyle,
+              textAlign: textAlign,
             ),
           ],
         ),

@@ -1,40 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:plastic_eliminator/Admin/add_event.dart';
-
-// class HomeAdmin extends StatefulWidget {
-//   const HomeAdmin({super.key});
-
-//   @override
-//   State<HomeAdmin> createState() => _HomeAdminState();
-// }
-
-// class _HomeAdminState extends State<HomeAdmin> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         leading: Image.asset('Assets/logo_image/logo.png'),
-//         centerTitle: true,
-//         title: Text(
-//           'Admin Home',
-//           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-//         ),
-//       ),
-//       body: Container(
-//         margin: EdgeInsets.only(top: 20, left: 20),
-//         child: TextButton(
-//             onPressed: () {
-//               Navigator.push(
-//                   context, MaterialPageRoute(builder: (context) => AddEvent()));
-//             },
-//             child: Text(
-//               'Add Event',
-//               style: TextStyle(color: Colors.grey),
-//             )),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:plastic_eliminator/Admin/add_event.dart';
 import 'package:plastic_eliminator/Admin/admin_login.dart'; // Ensure you have this import for navigation
@@ -85,7 +48,7 @@ class _HomeAdminState extends State<HomeAdmin> {
           },
           child: Text(
             'Add Event',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Colors.teal,fontSize: 20),
           ),
         ),
       ),

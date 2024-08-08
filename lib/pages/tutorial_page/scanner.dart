@@ -78,7 +78,7 @@ final Map<String, List<Map<String, String>>> categoryVideos = {
 class VideoList extends StatelessWidget {
   final String category;
 
-  VideoList({required this.category});
+  VideoList({required this.category, required String playlistId});
 
   @override
   Widget build(BuildContext context) {

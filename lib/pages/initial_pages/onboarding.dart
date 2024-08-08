@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:plastic_eliminator/pages/initial_pages/signup.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:smooth_page_indicator/src/effects/worm_effect.dart';
+import 'package:plastic_eliminator/pages/initial_pages/signup.dart';
 
 class OnboardingScreen extends StatefulWidget {
   @override
@@ -15,26 +13,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> _onboardingData = [
     {
-      'image': 'Assets/home_images/swiper_bottle.png',
+      'image': 'Assets/logo_image/onboardin1.png',
       'text':
-          'Welcome to Plastic Eliminator!\n Join us in the fight against plastic.',
+          'Welcome to Plastic Eliminator!\nJoin us in the fight against plastic.\n ',
     },
     {
-      'image': 'Assets/home_images/swiper_bottle.png',
+      'image': 'Assets/logo_image/onboard2.png',
       'text':
-          'Enjoy exciting, games.\nParticipate in Events and earn \nrewards.',
+          'Participate in Events and earn rewards.\nSupport Plastic Free Shopping.',
     },
     {
-      'image': 'Assets/home_images/swiper_bottle.png',
+      'image': 'Assets/logo_image/onboarding3.png',
       'text':
-          'Try Our Tools to Make a Difference:\nPlastic Calculator, Community, Scanner.',
+          'Try Plastic Calculator, Community\n Join Clubs.',
     },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Color(0xFFF6F1F1),
       body: Container(
         child: Column(
           children: [
@@ -60,17 +57,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           borderRadius: BorderRadius.circular(20),
                           child: Image.asset(
                             _onboardingData[index]['image']!,
-                            height: 400,
+                            height: 180,
                           ),
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 30),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           _onboardingData[index]['text']!,
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),
                         ),
                       ),
                     ],
@@ -89,7 +86,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     effect: WormEffect(
                       dotHeight: 10,
                       dotWidth: 10,
-                      activeDotColor: Colors.black,
+                      activeDotColor: Colors.teal,
+                      dotColor: Colors.white,
                     ),
                   ),
                   SizedBox(height: 20),
@@ -113,17 +111,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Text(
                         _currentPage < 2 ? 'Next' : 'Join the Movement',
                         style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white), // Set text color to pink
+                            fontSize: 25,
+                            color: Colors.teal,
+                            fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            Colors.grey[600], // Set background color to purple
                         padding:
                             EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                              15), // Set less rounded corners
+                          borderRadius: BorderRadius.circular(15),
                         ),
                       ),
                     ),
