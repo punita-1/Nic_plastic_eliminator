@@ -6,12 +6,14 @@ class ShopDetailsPage extends StatelessWidget {
   final String phoneNumber;
   final String address;
   final String description;
+  final String homeDelivery;
 
   const ShopDetailsPage({
     required this.shopName,
     required this.phoneNumber,
     required this.address,
     required this.description,
+    required this.homeDelivery,
     super.key,
   });
 
@@ -76,6 +78,11 @@ class ShopDetailsPage extends StatelessWidget {
             Text(
               'Description: $description',
               style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Home Delivery: $homeDelivery',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),

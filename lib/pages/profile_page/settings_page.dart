@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:plastic_eliminator/pages/initial_pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:your_app/pages/login_page.dart'; // Replace with your actual login page path
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
