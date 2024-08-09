@@ -8,14 +8,11 @@
 // // import 'package:random_string/random_string.dart';
 // // import 'bottomnav.dart';
 // // import 'package:shared_preferences/shared_preferences.dart';
-
 // // class Signup extends StatefulWidget {
 // //   const Signup({super.key});
-
 // //   @override
 // //   State<Signup> createState() => _SignupState();
 // // }
-
 // // class _SignupState extends State<Signup> {
 // //   final _emailController = TextEditingController();
 // //   final _passwordController = TextEditingController();

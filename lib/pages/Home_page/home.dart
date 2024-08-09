@@ -772,7 +772,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     return Stack(
       children: [
         SizedBox(
-          height: 165.0,
+          height: 160.0,
           child: SwiperPage(pageController: _pageController),
         ),
       ],
@@ -785,7 +785,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       children: [
         Container(
           width: MediaQuery.of(context).size.width, // Full width of the screen
-          height: 60, // Fixed height
+          height: 57, // Fixed height
           child: QuotesWidget(),
         ),
         SizedBox(height: 10.0),

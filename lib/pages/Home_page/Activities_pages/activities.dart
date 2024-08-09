@@ -47,7 +47,7 @@ class ActivitiesPage extends StatelessWidget {
                 ],
               ),
               SizedBox(
-                height: 15,
+                height: 12,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -62,7 +62,8 @@ class ActivitiesPage extends StatelessWidget {
                   _ActivityContainer(
                     text: localizations.calculator,
                     imagePath: 'Assets/images/calculator.png',
-                    destinationPage: Calculator(),
+                    // destinationPage: Calculator(),
+                    destinationPage: PlasticItemScreen(),
                     textStyle: Theme.of(context).textTheme.bodyLarge!,
                     textAlign: TextAlign.center,
                   ),
@@ -101,8 +102,8 @@ class _ActivityContainer extends StatelessWidget {
         );
       },
       child: Container(
-        height: 100,
-        width: 150,
+        height: 90,
+        width: 162,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(10),
@@ -112,8 +113,8 @@ class _ActivityContainer extends StatelessWidget {
           children: [
             Image.asset(
               imagePath,
-              height: 50,
-              width: 50,
+              height: 40,
+              width: 40,
             ),
             SizedBox(height: 8),
             Text(
