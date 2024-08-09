@@ -45,3 +45,4 @@ app.*.map.json
 # Exclude specific files
 lib/services/const.dart
 lib/pages/map_page/mapnerby.dart
+lib/pages/tutorial_page/youtube_playlist/video_list.dart

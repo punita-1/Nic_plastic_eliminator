@@ -54,12 +54,16 @@ class _ShopListState extends State<ShopList> {
                         phoneNumber:
                             shopData['phoneNumber'] ?? 'No Phone Number',
                         address: shopData['address'] ?? 'No Address',
+                        description:
+                            shopData['description'] ?? 'No Description',
+                        homeDelivery:
+                            shopData['home_delivery'] ?? 'Not Available',
                       ),
                     ),
                   );
                 },
                 child: Container(
-                  width: 80.0, 
+                  width: 80.0,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -71,7 +75,10 @@ class _ShopListState extends State<ShopList> {
                           color: Theme.of(context).colorScheme.secondary,
                         ),
                         child: Center(
-                          child: Icon(Icons.shopping_bag_outlined, color: Colors.white,),
+                          child: Icon(
+                            Icons.shopping_bag_outlined,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                       const SizedBox(

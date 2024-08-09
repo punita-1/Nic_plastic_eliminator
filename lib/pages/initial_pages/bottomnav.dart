@@ -4,7 +4,6 @@ import 'package:plastic_eliminator/pages/Home_page/home.dart';
 import 'package:plastic_eliminator/pages/map_page/mapnerby.dart';
 import 'package:plastic_eliminator/pages/profile_page/profile.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:plastic_eliminator/pages/tutorial_page/tutorial.dart';
 import 'package:plastic_eliminator/pages/tutorial_page/youtube_playlist/categories.dart';
 
 class Bottomnav extends StatefulWidget {
