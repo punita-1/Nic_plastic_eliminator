@@ -74,14 +74,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-    await initializeAuth(); // Initialize authentication
-  } catch (e) {
-    // Handle initialization errors here
-    print("Error initializing Firebase: $e");
-  }
 
+    await Firebase.initializeApp();
+    // Ensure all necessary initializations are completed
+    await initializeAuth(); 
+ 
+  
   runApp(MyApp());
 }
 
