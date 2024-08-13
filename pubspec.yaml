@@ -31,6 +31,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: "^0.13.1"
+  flutter_localizations:
+    sdk: flutter
 
 flutter_launcher_icons:
   android: "launcher_icon"
@@ -105,8 +107,8 @@ flutter:
 
     - Assets/Sounds/
     - Assets/images/
-    - Assets/home_images/
-    - Assets/logo_image/
+    - Assets/all_images/
+    - Assets/onboard_images/
     - Animations/
     - Assets/Sounds/correct.mp3
     - Assets/Sounds/music.mp3

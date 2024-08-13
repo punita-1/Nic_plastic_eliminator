@@ -1,125 +1,77 @@
-// import 'package:provider/provider.dart';
-// import 'package:flutter/material.dart';
-// import 'package:plastic_eliminator/local_notifier.dart';
-// import 'package:plastic_eliminator/services/firebase_auth_utils.dart';
-// import 'package:plastic_eliminator/pages/initial_pages/splash_screen.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:plastic_eliminator/themes/dark_theme.dart';
-// import 'package:plastic_eliminator/themes/light_theme.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
+// ignore_for_file: use_key_in_widget_constructors, depend_on_referenced_packages
 
-// void main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   try {
-//     await Firebase.initializeApp();
-//     await initializeAuth(); // Initialize authentication
-//   } catch (e) {
-//     // Handle initialization errors here
-//     print("Error initializing Firebase: $e");
-//   }
-
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatefulWidget {
-//   @override
-//   _MyAppState createState() => _MyAppState();
-// }
-
-// class _MyAppState extends State<MyApp> {
-//   final LocaleNotifier _localeNotifier = LocaleNotifier();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ChangeNotifierProvider<LocaleNotifier>(
-//       create: (context) => _localeNotifier,
-//       child: Consumer<LocaleNotifier>(
-//         builder: (context, localeNotifier, child) {
-//           return MaterialApp(
-//             debugShowCheckedModeBanner: false,
-//             title: 'Plastic Eliminator',
-//             theme: lightTheme,
-//             darkTheme: darkTheme,
-//             localizationsDelegates: [
-//               AppLocalizations.delegate,
-//               GlobalMaterialLocalizations.delegate,
-//               GlobalWidgetsLocalizations.delegate,
-//               GlobalCupertinoLocalizations.delegate,
-//             ],
-//             locale: localeNotifier.locale,
-//             supportedLocales: [
-//               Locale('en'),
-//               Locale('hi'),
-//             ],
-//             home: SplashScreen(),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-import 'package:plastic_eliminator/themes/theme_provider.dart';
+import 'package:plastic_eliminator/core/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:plastic_eliminator/local_notifier.dart';
-import 'package:plastic_eliminator/services/firebase_auth_utils.dart';
-import 'package:plastic_eliminator/pages/initial_pages/splash_screen.dart';
+import 'package:plastic_eliminator/features/profile_page/local_notifier.dart';
+import 'package:plastic_eliminator/core/utils/firebase_auth_utils.dart';
+import 'package:plastic_eliminator/features/onboarding/presentation/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:plastic_eliminator/themes/dark_theme.dart';
-import 'package:plastic_eliminator/themes/light_theme.dart';
+import 'package:plastic_eliminator/core/theme/dark_theme.dart';
+import 'package:plastic_eliminator/core/theme/light_theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-// import 'theme_provider.dart'; // Import the ThemeProvider
 
+/// The entry point of the application.
+/// Initializes Firebase and runs the [MyApp] widget.
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Ensure Flutter bindings are initialized
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(); // Initialize Firebase
     await initializeAuth(); // Initialize authentication
   } catch (e) {
-    // Handle initialization errors here
-    print("Error initializing Firebase: $e");
+    // Handle initialization errors
+    // print("Error initializing Firebase: $e");
   }
 
-  runApp(MyApp());
+  runApp(MyApp()); // Run the app
 }
 
+/// The main application widget.
+///
+/// Sets up localization, theming, and the initial screen to be displayed.
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  /// The locale notifier used to manage and provide the current locale.
   final LocaleNotifier _localeNotifier = LocaleNotifier();
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<LocaleNotifier>(create: (context) => _localeNotifier),
-        ChangeNotifierProvider<ThemeProvider>(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider<LocaleNotifier>(
+            create: (context) =>
+                _localeNotifier), // Provides the locale notifier
+        ChangeNotifierProvider<ThemeProvider>(
+            create: (context) =>
+                ThemeProvider()), // Provides the theme provider
       ],
       child: Consumer2<LocaleNotifier, ThemeProvider>(
         builder: (context, localeNotifier, themeProvider, child) {
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Plastic Eliminator',
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: themeProvider.themeMode,
-            localizationsDelegates: [
-              AppLocalizations.delegate,
+            debugShowCheckedModeBanner: false, // Hides the debug banner
+            title: 'Plastic Eliminator', // App title
+            theme: lightTheme, // Light theme
+            darkTheme: darkTheme, // Dark theme
+            themeMode: themeProvider.themeMode, // Controls theme mode
+            localizationsDelegates: const [
+              AppLocalizations
+                  .delegate, // Localization delegate for app strings
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            locale: localeNotifier.locale,
-            supportedLocales: [
-              Locale('en'),
-              Locale('hi'),
+            locale: localeNotifier.locale, // Current locale
+            supportedLocales: const [
+              Locale('en'), // Supported locale: English
+              Locale('hi'), // Supported locale: Hindi
             ],
-            home: SplashScreen(),
+            home: SplashScreen(), // Initial screen
           );
         },
       ),
